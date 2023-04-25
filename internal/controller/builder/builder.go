@@ -697,7 +697,7 @@ func BuildRestoreJob(name, namespace string, image string, command []string, arg
 	return job, nil
 }
 
-func BuildCfgManagerToolsContainer(sidecarRenderedParam *cfgcm.CfgManagerBuildParams, params BuilderParams, toolsMetas map[string]appsv1alpha1.ToolConfig) []corev1.Container {
+func BuildCfgManagerToolsContainer(sidecarRenderedParam *cfgcm.CfgManagerBuildParams, component *component.SynthesizedComponent, toolsMetas map[string]appsv1alpha1.ToolConfig) []corev1.Container {
 	toolContainers := make([]corev1.Container, 0, len(toolsMetas))
 	for _, toolConfig := range toolsMetas {
 		toolContainer := corev1.Container{
@@ -712,7 +712,7 @@ func BuildCfgManagerToolsContainer(sidecarRenderedParam *cfgcm.CfgManagerBuildPa
 		toolContainers = append(toolContainers, toolContainer)
 	}
 	for i := range toolContainers {
-		injectEnvs(params, sidecarRenderedParam.EnvConfigName, &toolContainers[i])
+		injectEnvs(sidecarRenderedParam.Cluster, component, sidecarRenderedParam.EnvConfigName, &toolContainers[i])
 	}
 	return toolContainers
 }
