@@ -89,9 +89,7 @@ func TestResourceConstraint_ConstraintList(t *testing.T) {
 		panic("Failed to unmarshal resource constraint: %v" + err.Error())
 	}
 	var constraints []appsv1alpha1.ResourceConstraint
-	for _, constraint := range cf.Spec.Constraints {
-		constraints = append(constraints, constraint)
-	}
+	constraints = append(constraints, cf.Spec.Constraints...)
 	sort.Sort(ByConstraintList(constraints))
 	resources := constraints[0].GetMinimalResources()
 	assert.Equal(t, resources.Cpu().Cmp(resource.MustParse("0.1")) == 0, true)
