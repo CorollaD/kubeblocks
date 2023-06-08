@@ -237,8 +237,8 @@ func (m *ResourceConstraint) CompleteResources(r corev1.ResourceList) corev1.Res
 // GetMinimalResources gets the minimal resources meets the constraint
 func (m *ResourceConstraint) GetMinimalResources() corev1.ResourceList {
 	var (
-		minCPU    = resource.Quantity{}
-		minMemory = resource.Quantity{}
+		minCPU    resource.Quantity
+		minMemory resource.Quantity
 	)
 
 	if len(m.CPU.Slots) == 0 && (m.CPU.Min == nil || m.CPU.Min.IsZero()) {
