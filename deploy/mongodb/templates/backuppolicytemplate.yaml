@@ -29,3 +29,7 @@ spec:
       backupsHistoryLimit: 7
       target:
         role: primary
+      backupStatusUpdates:
+        - path: manifests
+          containerName: mongodb
+          script: /kb-scripts/backup-manifests-collector.sh

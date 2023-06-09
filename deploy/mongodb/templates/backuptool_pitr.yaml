@@ -1,0 +1,59 @@
+apiVersion: dataprotection.kubeblocks.io/v1alpha1
+kind: BackupTool
+metadata:
+  name: mongodb-physical-backup-tool
+  labels:
+    clusterdefinition.kubeblocks.io/name: mongodb
+    {{- include "mongodb.labels" . | nindent 4 }}
+spec:
+  image: wal-g-mongo:latest
+  deployKind: deployment
+  env:
+    - name: DATA_DIR
+      value: /data/mongodb/db
+    - name: ARCHIVE_AFTER_SIZE
+      value: 20971520
+  physical:
+    restoreCommands:
+      - |
+        set -e
+        export MONGODB_URI=mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/?authSource=admin&connect=direct&socketTimeoutMS=60000&connectTimeoutMS=10000&tls=true
+        export WALG_FILE_PREFIX=${BACKUP_DIR}
+        wal-g oplog-replay ${START_TIME} ${RECOVERY_TIME}
+    incrementalRestoreCommands: []
+  logical:
+    restoreCommands: []
+    incrementalRestoreCommands: []
+  backupCommands:
+    - |
+      export MONGODB_URI=mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/?authSource=admin&connect=direct&socketTimeoutMS=60000&connectTimeoutMS=10000&tls=true
+      export WALG_FILE_PREFIX=${BACKUP_DIR}
+      export OPLOG_ARCHIVE_TIMEOUT_INTERVAL={ARCHIVE_INTERVAL}
+      export OPLOG_ARCHIVE_AFTER_SIZE=${ARCHIVE_AFTER_SIZE}
+      export OPLOG_PITR_DISCOVERY_INTERVAL=${BACKUP_RETENTION}
+      # TODO log wal-g oplog-push
+      wal-g oplog-push >wal-g-oplog.log 2>&1 &
+      wal-g-pid=$!
+      echo "start to archive oplog..."
+      retryTimes=0
+      while true; do
+        check-pid=$(ps -ax|awk '{print $1}' | grep -e $wal-g-pid)
+        if [[ $? -ne 0 ]];then
+          echo "ERROR: the wal-g oplog push process does not exist!"
+          cat wal-g-oplog.log
+          exit 1
+        fi
+        isPrimary=$(mongo -u ${DB_USER} -p ${DB_PASSWORD} --port ${DB_PORT} -host ${DB_HOST} --authenticationDatabase admin  --eval 'db.isMaster().ismaster' --quiet)
+        if [[ ${isPrimary} != "true" ]];then
+          echo "isPrimary: ${isPrimary}"
+          retryTimes=$(($retryTimes+1))
+        else
+          retryTimes=0
+        fi
+        if [[ $retryTimes -ge 3 ]];then
+           echo "ERROR: the current mongo instance is not a primary node, 3 attempts have been made!"
+           exit 1
+        fi
+        sleep 1
+      done
+  incrementalBackupCommands: []

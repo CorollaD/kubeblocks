@@ -22,7 +22,6 @@ package dataprotection
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"reflect"
 	"sort"
 	"strings"
@@ -136,7 +135,7 @@ func (r *BackupPolicyReconciler) deleteExternalResources(reqCtx intctrlutil.Requ
 		dataprotectionv1alpha1.BackupTypeLogFile, dataprotectionv1alpha1.BackupTypeSnapshot} {
 		key := types.NamespacedName{
 			Namespace: viper.GetString(constant.CfgKeyCtrlrMgrNS),
-			Name:      r.getCronJobName(backupPolicy.Name, backupPolicy.Namespace, v),
+			Name:      getCreatedCRNameByBackupPolicy(backupPolicy.Name, backupPolicy.Namespace, v),
 		}
 		if err := r.Client.Get(reqCtx.Ctx, key, cronjob); err != nil {
 			if apierrors.IsNotFound(err) {
@@ -262,14 +261,6 @@ func (r *BackupPolicyReconciler) removeOldestBackups(reqCtx intctrlutil.RequestC
 	return nil
 }
 
-func (r *BackupPolicyReconciler) getCronJobName(backupPolicyName, backupPolicyNamespace string, backupType dataprotectionv1alpha1.BackupType) string {
-	name := fmt.Sprintf("%s-%s", backupPolicyName, backupPolicyNamespace)
-	if len(name) > 30 {
-		name = name[:30]
-	}
-	return fmt.Sprintf("%s-%s", name, string(backupType))
-}
-
 // buildCronJob builds cronjob from backup policy.
 func (r *BackupPolicyReconciler) buildCronJob(
 	backupPolicy *dataprotectionv1alpha1.BackupPolicy,
@@ -288,7 +279,7 @@ func (r *BackupPolicyReconciler) buildCronJob(
 	}
 	cueValue := intctrlutil.NewCUEBuilder(*cueTpl)
 	options := backupPolicyOptions{
-		Name:             r.getCronJobName(backupPolicy.Name, backupPolicy.Namespace, backType),
+		Name:             getCreatedCRNameByBackupPolicy(backupPolicy.Name, backupPolicy.Namespace, backType),
 		BackupPolicyName: backupPolicy.Name,
 		Namespace:        backupPolicy.Namespace,
 		Cluster:          target.LabelsSelector.MatchLabels[constant.AppInstanceLabelKey],

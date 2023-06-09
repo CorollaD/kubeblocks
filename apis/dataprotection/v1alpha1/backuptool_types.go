@@ -28,9 +28,8 @@ type BackupToolSpec struct {
 	Image string `json:"image"`
 
 	// which kind for run a backup tool.
-	// +kubebuilder:validation:Enum={job,daemon}
 	// +kubebuilder:default=job
-	DeployKind string `json:"deployKind,omitempty"`
+	DeployKind DeployKind `json:"deployKind,omitempty"`
 
 	// the type of backup tool, file or pitr
 	// +kubebuilder:validation:Enum={file,pitr}

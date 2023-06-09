@@ -50,6 +50,8 @@ const (
 	hostNameLabelKey = "kubernetes.io/hostname"
 )
 
+const manifestsUpdaterContainerName = "manifests-updater"
+
 var reconcileInterval = time.Second
 
 func init() {

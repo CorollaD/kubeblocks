@@ -18,12 +18,13 @@ package v1alpha1
 
 // BackupPhase The current phase. Valid values are New, InProgress, Completed, Failed.
 // +enum
-// +kubebuilder:validation:Enum={New,InProgress,Completed,Failed}
+// +kubebuilder:validation:Enum={New,InProgress,Running,Completed,Failed}
 type BackupPhase string
 
 const (
 	BackupNew        BackupPhase = "New"
 	BackupInProgress BackupPhase = "InProgress"
+	BackupRunning    BackupPhase = "Running"
 	BackupCompleted  BackupPhase = "Completed"
 	BackupFailed     BackupPhase = "Failed"
 )
@@ -75,4 +76,12 @@ const (
 	RestoreJobInProgressLogic RestoreJobPhase = "InProgressLogic"
 	RestoreJobCompleted       RestoreJobPhase = "Completed"
 	RestoreJobFailed          RestoreJobPhase = "Failed"
+)
+
+// +kubebuilder:validation:Enum={job,deployment}
+type DeployKind string
+
+const (
+	DeployKindJob        DeployKind = "job"
+	DeployKindDeployment DeployKind = "deployment"
 )
