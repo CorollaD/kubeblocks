@@ -30,7 +30,8 @@ spec:
       export WALG_FILE_PREFIX=${BACKUP_DIR}
       export OPLOG_ARCHIVE_TIMEOUT_INTERVAL={ARCHIVE_INTERVAL}
       export OPLOG_ARCHIVE_AFTER_SIZE=${ARCHIVE_AFTER_SIZE}
-      export OPLOG_PITR_DISCOVERY_INTERVAL=${BACKUP_RETENTION}
+      # retention time
+      export OPLOG_PITR_DISCOVERY_INTERVAL=168h
       # TODO log wal-g oplog-push
       wal-g oplog-push >wal-g-oplog.log 2>&1 &
       wal-g-pid=$!
