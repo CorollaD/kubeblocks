@@ -2,6 +2,14 @@
   "$schema": "http://json-schema.org/schema#",
   "type": "object",
   "properties": {
+    "name": {
+      "title": "Name",
+      "description": "cluster name",
+      "type": "string",
+      "default": "mycluster",
+      "maxLength": 16,
+      "pattern": "^[a-z]([-a-z0-9]*[a-z0-9])?$"
+    },
     "version": {
       "title": "Version",
       "description": "mysql version",
@@ -40,15 +48,7 @@
       "title": "Memory(Gi)",
       "description": "memory, the unit is Gi",
       "type": "number",
-      "default": 1,
-      "minimum": {
-        "multipleOf": 0.5,
-        "source": "cpu"
-      },
-      "maximum": {
-        "multipleOf": 32,
-        "source": "cpu"
-      }
+      "default": 1
     },
     "storageSize": {
       "title": "Storage(Gi)",

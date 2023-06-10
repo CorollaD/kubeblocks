@@ -2,6 +2,8 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+name: mycluster
+
 ## @param version MySQL cluster version
 version: ac-mysql-8.0.30
 
@@ -14,11 +16,11 @@ replicas: 1
 
 ## @param cpu
 ##
-cpu: 1
+cpu: 0.5
 
 ## @param memory in GB
 ##
-memory: 1
+memory: 0.5
 
 ## @param storageSize in GB
 ##
